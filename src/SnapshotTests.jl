@@ -8,7 +8,7 @@ import Pkg
 macro snapshot_test(file, expr, comparator=(==), path=joinpath(dirname(Pkg.project().path), "snapshots"))
     return quote
         snapshot_path = joinpath($path, $file)
-        observed = $expr
+        observed = $(esc(expr))
         if !Base.Filesystem.isfile(snapshot_path)
             # snapshot does not exist. Check environment to see if we should create it.
             if !haskey(ENV, "CREATE_NONEXISTENT_SNAPSHOTS") || lowercase(ENV["CREATE_NONEXISTENT_SNAPSHOTS"]) ∉ ["yes", "true", "1"]
