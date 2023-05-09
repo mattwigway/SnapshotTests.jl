@@ -1,0 +1,13 @@
+name = "SnapshotTests"
+uuid = "4acb3128-ab29-4f79-81e6-a8e25fdcc44d"
+authors = ["Matt Bhagat-Conway <matt@indicatrix.org> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
