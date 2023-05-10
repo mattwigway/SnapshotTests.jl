@@ -23,3 +23,13 @@ ERROR: Snapshot file .../snapshots/myfile5 does not exist! Re-run with environme
 This is expected—when you first create the test, there's nothing to compare the value against. As the error message indicates, if you re-run with the environment variable `CREATE_NONEXISTENT_SNAPSHOTS=yes`, the snapshot file will be created. You should investigate that the snapshotted value is correct before committing the snapshot file to version control.
 
 `SnapshotTests` will only ever create a snapshot file that does not exist; it will _never_ overwrite an existing snapshot file. This is to avoid inadvertently updating old snapshot to include unwanted results when creating new snapshots. To update a snapshot, just delete the serialized file from the `snapshots/` directory, and update the snapshots again.
+
+`Base.isequal(result, expected)` must be `true` for a snapshot test to pass. Structs are [only equal if their fields are identity-equal (not value-equal)](https://discourse.julialang.org/t/surprising-struct-equality-test/4890). The [StructEquality.jl](https://github.com/jolin-io/StructEquality.jl) library is often helpful for creating value based `isequal` functions.
+
+You can also specify a custom comparator at the end of the `@snapshot_test` macro. For instance, to use `isapprox`:
+
+```{julia}
+@snapshot_test "test_name" (isapprox)
+```
+
+Parentheses are optional but improve readability IMHO.
