@@ -5,10 +5,25 @@ import Logging: @warn
 import Serialization: serialize, deserialize
 import Pkg
 
-macro snapshot_test(file, expr, comparator=(==), path=joinpath(dirname(Pkg.project().path), "snapshots"))
+function find_project_dir(dir)
+    while !isfile(joinpath(dir, "Project.toml"))
+        new_dir = dirname(dir)
+        new_dir == dir && error("Did not find Project.toml!")
+        dir = new_dir
+    end
+    return dir
+end
+
+macro snapshot_test(file, expr, comparator=isequal, path=nothing)
     return quote
-        snapshot_path = joinpath($path, $file)
+        snapshot_path = if isnothing($path)
+            joinpath(find_project_dir(Base.source_dir()), "snapshots", $file)
+        else
+            joinpath($path, $file)
+        end
+
         observed = $(esc(expr))
+
         if !Base.Filesystem.isfile(snapshot_path)
             # snapshot does not exist. Check environment to see if we should create it.
             if !haskey(ENV, "CREATE_NONEXISTENT_SNAPSHOTS") || lowercase(ENV["CREATE_NONEXISTENT_SNAPSHOTS"]) ∉ ["yes", "true", "1"]
@@ -16,8 +31,8 @@ macro snapshot_test(file, expr, comparator=(==), path=joinpath(dirname(Pkg.proje
             else
                 # create the snapshot file
                 @warn "Snapshot file $snapshot_path does not exist, creating."
-                if !isdir($path)
-                    mkdir($path)
+                if !isdir(dirname(snapshot_path))
+                    mkdir(dirname(snapshot_path))
                 end
 
                 open(snapshot_path, "w") do fp
