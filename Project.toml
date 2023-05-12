@@ -1,7 +1,7 @@
 name = "SnapshotTests"
 uuid = "4acb3128-ab29-4f79-81e6-a8e25fdcc44d"
 authors = ["Matt Bhagat-Conway <matt@indicatrix.org> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
