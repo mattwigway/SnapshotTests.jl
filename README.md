@@ -17,7 +17,7 @@ This will compute `expression`, and compare the result against a serialized valu
 The first time you run the code above, you'll get an error:
 
 ```
-ERROR: Snapshot file .../snapshots/test_name does not exist! Re-run with environment variable CREATE_NONEXISTENT_SNAPSHOTS=yes to create.
+ERROR: Snapshot file .../snapshots/test_name.gz does not exist! Re-run with environment variable CREATE_NONEXISTENT_SNAPSHOTS=yes to create.
 ```
 
 This is expected—when you first create the test, there's nothing to compare the value against. As the error message indicates, if you re-run with the environment variable `CREATE_NONEXISTENT_SNAPSHOTS=yes`, the snapshot file will be created. You should investigate that the snapshotted value is correct before committing the snapshot file to version control.

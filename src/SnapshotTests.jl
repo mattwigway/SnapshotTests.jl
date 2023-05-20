@@ -4,6 +4,7 @@ import Test: @test
 import Logging: @warn
 import Serialization: serialize, deserialize
 import Pkg
+import GZip: gzopen
 
 function find_project_dir(dir)
     while !isfile(joinpath(dir, "Project.toml"))
@@ -17,9 +18,9 @@ end
 macro snapshot_test(file, expr, comparator=isequal, path=nothing)
     return quote
         snapshot_path = if isnothing($path)
-            joinpath(find_project_dir(Base.source_dir()), "snapshots", $file)
+            joinpath(find_project_dir(Base.source_dir()), "snapshots", $file * ".gz")
         else
-            joinpath($path, $file)
+            joinpath($path, $file * ".gz")
         end
 
         observed = $(esc(expr))
@@ -35,13 +36,13 @@ macro snapshot_test(file, expr, comparator=isequal, path=nothing)
                     mkdir(dirname(snapshot_path))
                 end
 
-                open(snapshot_path, "w") do fp
+                gzopen(snapshot_path, "w") do fp
                     serialize(fp, observed)
                 end
             end
         else
             # snapshot does exist
-            expected = open(snapshot_path, "r") do fp
+            expected = gzopen(snapshot_path, "r") do fp
                 deserialize(fp)
             end
 
