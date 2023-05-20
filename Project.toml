@@ -1,7 +1,7 @@
 name = "SnapshotTests"
 uuid = "4acb3128-ab29-4f79-81e6-a8e25fdcc44d"
 authors = ["Matt Bhagat-Conway <matt@indicatrix.org> and contributors"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 GZip = "92fee26a-97fe-5a0c-ad85-20a5f3185b63"
@@ -11,7 +11,8 @@ Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-julia = "1.6"
+julia = "^1.6"
+GZip = "^0.5.1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
