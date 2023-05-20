@@ -10,7 +10,7 @@ To create a snapshot test, add to your test file:
 @snapshot_test "test_name" expression
 ```
 
-This will compute `expression`, and compare the result against a serialized value (the snapshot). By default, snapshots will be found in `$JULIA_PROJECT/snapshots`. Within that folder, there will be one snapshot for each snapshot test, serialized using the built-in Julia `Serialization` module.
+This will compute `expression`, and compare the result against a serialized value (the snapshot). By default, snapshots will be found in `$JULIA_PROJECT/snapshots`. Within that folder, there will be one snapshot for each snapshot test, serialized using the built-in Julia `Serialization` module and gzipped.
 
 ### Creating snapshots
 
@@ -29,7 +29,7 @@ This is expected—when you first create the test, there's nothing to compare th
 You can also specify a custom comparator at the end of the `@snapshot_test` macro. For instance, to use `isapprox`:
 
 ```{julia}
-@snapshot_test "test_name" (isapprox)
+@snapshot_test "test_name" expression (isapprox)
 ```
 
 Parentheses are optional but improve readability IMHO.
