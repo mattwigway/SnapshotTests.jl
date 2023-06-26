@@ -5,6 +5,7 @@ import Logging: @warn
 import Serialization: serialize, deserialize
 import Pkg
 import GZip: gzopen
+import Infiltrator: @infiltrate
 
 function find_project_dir(dir)
     while !isfile(joinpath(dir, "Project.toml"))
@@ -46,7 +47,17 @@ macro snapshot_test(file, expr, comparator=isequal, path=nothing)
                 deserialize(fp)
             end
 
-            @test $comparator(observed, expected)
+            # in normal mode, just do a test. But in REPL mode, drop into a REPL for investigating differences.
+            if !haskey(ENV, "START_REPL_ON_SNAPSHOT_FAILURE") || lowercase(ENV["START_REPL_ON_SNAPSHOT_FAILURE"]) ∉ ["yes", "true", "1"]
+                @test $comparator(observed, expected)
+            elseif !($comparator(observed, expected))
+                # make observed and expected visible outside the macro
+                $(esc(:(observed))) = observed
+                $(esc(:(expected))) = expected
+                
+                @error "Test failed, starting REPL.\nThe observed result is available in the variable `observed`, the expected in the variable `expected`" stacktrace()
+                @infiltrate
+            end
         end
     end
 end

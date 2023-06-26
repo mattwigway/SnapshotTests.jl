@@ -33,3 +33,19 @@ You can also specify a custom comparator at the end of the `@snapshot_test` macr
 ```
 
 Parentheses are optional but improve readability IMHO.
+
+### Dealing with failed snapshot tests (not yet released)
+
+Normally, failed snapshot tests result in test failures (as one would expect). However, debugging failed snapshot tests can be difficult, as there is just a yes/no indication of equality with what is almost certainly a complex object. If you start the tests from the REPL (not by running `]test`, but by running `include("runtests.jl")`), and have the environment variable `START_REPL_ON_SNAPSHOT_FAILURE=yes`, [Infiltrator.jl](https://github.com/JuliaDebug/Infiltrator.jl) will be used to start a REPL with the variables `observed` (what the test code produced) and `expected` (what was read in from the snapshot) to evaluate the differences interactively.
+
+If you determine that the changes are as expected, you can delete the snapshot files and recreate them (see above). However, my preference is to instead write a custom comparator function that returns true if all of the differences are as expected, ensure the test passes with the custom comparator, commit the custom comparator to the repository to document the expected changes, and then delete and recreate the snapshots and restore the original comparator. This avoids testing being based on results in an interactive session, which is a bad practice—though certainly useful to debug as a precursor to writing the custom comparator.
+
+Actually starting the tests interactively is a challenge because the test environment is created on the fly by combining the project environment with the test environment. [TestEnv.jl](https://github.com/JuliaTesting/TestEnv.jl) can solve this problem, as it allows activating the test environment of the active project. To avoid installing it as a dependency in my main project, I prefer to install it in the global environment and load it before activating my package. So a full interactive testing run would look something like this:
+
+```
+my-project $ START_REPL_ON_SNAPSHOT_FAILURE=yes julia
+julia> import TestEnv
+(@v1.9) pkg> ]activate .
+julia> TestEnv.activate()
+julia> include("test/runtests.jl")
+```
